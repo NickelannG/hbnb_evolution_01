@@ -18,10 +18,12 @@ class Amenity():
         self.__amenity_id = ""
 
 
-        if kwargs:
+        if kwargs: # Keyword arguments passed in _init_ method
             for key, value in kwargs.items():
                 if key == "name":
-                    setattr(self, key, value)
+                    self.name = value
+                elif key == "amenity_id":
+                    self.amenity_id = value
 
     @property
     def name(self):
