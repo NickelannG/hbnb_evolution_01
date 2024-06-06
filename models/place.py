@@ -8,20 +8,20 @@ from data import place_data, user_data, city_data
 class Place():
     """Defines a place"""
 
-    def ___init__(self, *args, **kwargs):
+    def __init__(self, description, address, latitude, longitude, num_rooms, num_bathrooms, price_per_night, max_guests ):
         """ constructor """
 
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now().timestamp()
         self.updated_at = self.created_at
-        self.description
-        self.address
-        self.latitude
-        self.longitude
-        self.num_rooms
-        self.num_bathrooms
-        self.price_per_night
-        self.max_guests
+        self.description = description
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+        self.num_rooms = num_rooms
+        self.num_bathrooms = num_bathrooms
+        self.price_per_night = price_per_night
+        self.max_guests = max_guests
         self.__name = ""
         self.__host_user_id = ""
         self.__city_id = ""
@@ -34,7 +34,7 @@ class Place():
     @name.setter
     def name(self, value):
         """Setter for place name"""
-        is_valid_name = len(value.strip()) > 0 re.search("^[a-zA-Z ]+$", value)
+        is_valid_name = len(value.strip()) > 0 and re.search("^[a-zA-Z ]+$", value)
         # check for valid name
         if is_valid_name:
             self.__name = value
@@ -55,6 +55,15 @@ class Place():
         else:
             raise ValueError("Invalid host_user_id specified: {}".format(value))
 
-
     @property
-    def 
+    def city_id(self):
+        """ Getter for private attr city_id"""
+        return self.__city_id
+    
+    @city_id.setter
+    def city_id(self, value):
+        """Setter for city_id """
+        if city_data.get(value) is not None:
+            self.__city_id = value
+        else:
+            raise ValueError("Invalid city_id specified: {}".format(value))
