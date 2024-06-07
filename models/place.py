@@ -7,25 +7,37 @@ from data import place_data, user_data, city_data
 
 class Place():
     """Defines a place"""
-
-    def __init__(self, description, address, latitude, longitude, num_rooms, num_bathrooms, price_per_night, max_guests ):
+    def __init__(self, *args, **kwargs):
         """ constructor """
 
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now().timestamp()
         self.updated_at = self.created_at
-        self.description = description
-        self.address = address
-        self.latitude = latitude
-        self.longitude = longitude
-        self.num_rooms = num_rooms
-        self.num_bathrooms = num_bathrooms
-        self.price_per_night = price_per_night
-        self.max_guests = max_guests
+        self.description = ""
+        self.address = ""
+        self.latitude = 0.0
+        self.longitude = 0.0
+        self.num_rooms = 0
+        self.num_bathrooms = 0
+        self.price_per_night = 0.0
+        self.max_guests = 0
+
+        # private variables
         self.__name = ""
         self.__host_user_id = ""
         self.__city_id = ""
 
+        attr_list = [
+            "description", "address", "latitude", "longitude",
+            "num_rooms", "num_bathrooms", "price_per_night", "max_guests",
+            "name", "host_user_id", "city_id"
+        ]
+
+        if kwargs:
+            for key, value in kwargs.items():
+                if key in attr_list:
+                    setattr(self, key, value)
+    
     @property
     def name(self):
         """ Getter for place name """

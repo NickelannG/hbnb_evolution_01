@@ -27,12 +27,12 @@ class Amenity():
 
     @property
     def name(self):
-        """Getter for private prop Amen."""
+        """Getter for private prop name."""
         return self.__name
     
     @name.setter
     def name(self, value):
-        """Setter for private prop Amen."""
+        """Setter for private prop name."""
 
         is_valid_name = len(value.strip()) > 0 and re.search("^[a-zA-Z]+$", value)
         if is_valid_name:

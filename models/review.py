@@ -8,16 +8,25 @@ from data import review_data, user_data, place_data
 class Review():
     """Representation of Reviews"""
 
-    def __init__(self, commmenter_user_id, place_id, rating):
+    def __init__(self, *args, **kwargs):
         """The constructor"""
 
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now().timestamp()
         self.updated_at = self.created_at
         self.feedback = ""
-        self.__commenter_user_id = commmenter_user_id
-        self.__place_id = place_id
-        self.__rating = rating
+        self.__commenter_user_id = ""
+        self.__place_id = ""
+        self.__rating = ""
+
+        attr_list = [
+            "feedback", "commenter_user_id", "place_id", "rating"
+        ]
+
+        if kwargs:
+            for key, value in kwargs.items():
+                if key in attr_list:
+                    setattr(self, key, value)
 
     @property
     def commenter_user_id(self):
@@ -25,7 +34,7 @@ class Review():
         return self.__commenter_user_id
     
     @commenter_user_id.setter
-    def name(self, value):
+    def commenter_user_id(self, value):
         """Setter for commenter_user_id"""
         if user_data.get(value) is not None:
             self.__commenter_user_id = value
