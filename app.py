@@ -316,7 +316,7 @@ def countries_specific_get(country_code):
 
 @app.route('/api/v1/countries/<country_code>', methods=["PUT"])
 def countries_put(country_code):
-    """ updates existing user data using specified id """
+    """ updates existing country data using specified id """
     # -- Usage example --
     # curl -X PUT [URL] /
     #    -H "Content-Type: application/json" /
@@ -358,15 +358,23 @@ def countries_put(country_code):
 @app.route('/api/v1/countries/<country_code>/cities', methods=["GET"])
 def countries_specific_cities_get(country_code):
     """ returns cities data of specified country """
+
+    # Initialize empty list to store cities data
     data = []
+    
+    # Initialize a variable to store the country ID we are looking for
     wanted_country_id = ""
 
+    # Iterate through the country_data dictionary to find the country with the provided country code
     for k, v in country_data.items():
         if v['code'] == country_code:
+            # Once the country with the specified code is found, store its ID
             wanted_country_id = v['id']
 
+    # Iterate through the city_data dictionary to find cities belonging to the country with the wanted_country_id
     for k, v in city_data.items():
         if v['country_id'] == wanted_country_id:
+            # If the city belongs to the country, construct a dictionary containing city details and append it to the data list
             data.append({
                 "id": v['id'],
                 "name": v['name'],
@@ -382,6 +390,9 @@ def countries_specific_cities_get(country_code):
 #  - Amenity
 #  - Place
 #  - Review
+
+# --- CITY ---
+# note the capital C for city and lowercase for country
 
 @app.route('/api/v1/cities', methods=["GET"])
 def cities_get():
@@ -418,7 +429,7 @@ def city_specific_get(city_id):
     })
     return jsonify(data)
 
-@app.route('/api/v1/city', methods=["POST"])
+@app.route('/api/v1/cities', methods=["POST"])
 def city_post():
     """Posts data for new city then returns the city data"""
 
@@ -428,11 +439,159 @@ def city_post():
     data = request.get_json()
     if 'name' not in data:
         abort(400, "Missing name")
+    # need to check country id as well
+    if 'country_id' not in data:
+        abort(400, "Missing country_id") 
 
     try:
-        u = City(name=data["name"], country_id=data["country_id"])
+        C = City(name=data["name"], country_id=data["country_id"])
     except ValueError as exc:
         return repr(exc) + "\n"
+
+    # add new user data to user_data
+    # note that the created_at and updated_at are using timestamps
+    
+    City_data[C.id] = {
+        "id": C.id,
+        "name": C.name,
+        "country_id": C.country_id,
+        "created_at": C.created_at,
+        "updated_at": C.updated_at
+    }
+
+    # note that the created_at and updated_at are using readable datetimes
+    attribs = {
+        "id": C.id,
+        "name": C.name,
+        "country_id": C.country_id,
+        "created_at": datetime.fromtimestamp(C.created_at),
+        "updated_at": datetime.fromtimestamp(C.updated_at)
+    }
+
+    return jsonify(attribs)
+
+@app.route('/api/v1/cities/<city_id>', methods=["PUT"])
+def cities_put(city_id):
+    """ updates existing city data using specified id """
+
+    # initialize empty dictionary to hold the city data if found
+    C = {}
+
+    if request.get_json() is None:
+        abort(400, "Not a JSON")
+
+    data = request.get_json()
+    for k, v in city_data.items():
+        if v['id'] == city_id:
+            C = v
+
+    if not C:
+        abort(400, "City not found for id {}".format(city_id))
+
+    # modify the values
+    # only name is allowed to be modified
+    for k, v in data.items():
+        if k in ["name", "country_id"]:
+            C[k] = v
+    
+    # update 'updated_at' timestamp
+    C["updated_at"] = datetime.now().timestamp()
+
+    # update city_data - print city_data out to confirm it if you want
+    city_data[C['id']] = C
+
+    attribs = {
+        "id": C["id"],
+        "name": C["name"],
+        "country_id": C["country_id"],
+        "created_at": datetime.fromtimestamp(C["created_at"]),
+        "updated_at": datetime.fromtimestamp(C["updated_at"])
+    }
+
+    # print out the updated user details
+    return jsonify(attribs)
+
+@app.route('/api/v1/cities/<city_id>/countries', methods=["GET"])
+def cities_specific_country_get(city_id):
+    """returns contries data of specified city"""
+    
+    # Check if the provided city ID exists in the city_data dictionary
+    if city_id not in city_data:
+        # If city not found, return a message indicating so
+        return "City not found!"
+    
+    # Retrieve the city's details from city_data
+    city = city_data[city_id]
+    
+    # Retrieve the country ID associated with the city
+    country_id = city['country_id']
+
+    # Check if the country ID exists in country_data dictionary
+    if country_id not in country_data:
+        # If country not found for the city, return a message indicating so
+        return "Country not found for city with ID: {}".format(city_id)
+    
+    # Retrieve the country's details from country_data
+    c = country_data[country_id]
+    
+    # Construct country details dictionary with required information
+    country_details = {
+        "id": c['id'],
+        "name": c['name'],
+        "code": c['code'],
+        "created_at": datetime.fromtimestamp(c['created_at']),
+        "updated_at": datetime.fromtimestamp(c['updated_at'])
+    }
+
+    # Return the country details as JSON response
+    return jsonify(country_details)
+
+
+# --- REVIEW ---
+@app.route('/app/v1/reviews', methods=["GET"])
+def reviews_():
+    """Return Reviews"""
+    data = []
+
+    for k, v in review_data.items():
+        data.append({
+            "id": v['id'],
+            "feedback": v['feedback'],
+            "commentor_user_id": v["commentor_user_id"],
+            "place_id": v["place_id"],
+            "rating": v["rating"],
+            "created_at": datetime.fromtimestamp(v['created_at']),
+            "updated_at": datetime.fromtimestamp(v['updated_at'])
+        })
+    return jsonify(data)
+
+@app.route('/app/v1/reviews/<review_id>', methods=["GET"])
+def reviews_speific_get(review_id):
+    """returns specified review"""
+    data = []
+
+    if review_id not in review_data:
+        # raise IndexError("Review not found!")
+        return "Review not found!"
+    
+    v = review_data[review_id]
+    data.append({
+            "id": v['id'],
+            "feedback": v['feedback'],
+            "commentor_user_id": v["commentor_user_id"],
+            "place_id": v["place_id"],
+            "rating": v["rating"],
+            "created_at": datetime.fromtimestamp(v['created_at']),
+            "updated_at": datetime.fromtimestamp(v['updated_at'])
+    })
+    return jsonify(data)
+
+
+
+
+# --- AMENITY ---
+# --- PLACE ---
+
 # WIP..
 # Set debug=True for the server to auto-reload when there are changes
 if __name__ == '__main__':
