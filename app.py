@@ -383,7 +383,57 @@ def countries_specific_cities_get(country_code):
 #  - Place
 #  - Review
 
+@app.route('/api/v1/cities', methods=["GET"])
+def cities_get():
+    """returns Cities"""
+    data = []
 
+    for k, v in city_data.items():
+        data.append({
+            "id": v['id'],
+            "name": v['name'],
+            "country_id": v['country_id'],
+            "created_at": datetime.fromtimestamp(v['created_at']),
+            "updated_at": datetime.fromtimestamp(v['updated_at'])
+        })
+
+    return jsonify(data)
+
+@app.route('/api/v1/city/<city_id>', methods=["GET"])
+def city_specific_get(city_id):
+    """returns specific city"""
+    data = []
+
+    if city_id not in city_data:
+        # raise IndexError("City not found!")
+        return "City not found!"
+
+    v = city_data[city_id]
+    data.append({
+        "id": v['id'],
+            "name": v['name'],
+            "country_id": v['country_id'],
+            "created_at": datetime.fromtimestamp(v['created_at']),
+            "updated_at": datetime.fromtimestamp(v['updated_at'])
+    })
+    return jsonify(data)
+
+@app.route('/api/v1/city', methods=["POST"])
+def city_post():
+    """Posts data for new city then returns the city data"""
+
+    if request.get_json() is None:
+        abort(400, "Not a JSON")
+    
+    data = request.get_json()
+    if 'name' not in data:
+        abort(400, "Missing name")
+
+    try:
+        u = City(name=data["name"], country_id=data["country_id"])
+    except ValueError as exc:
+        return repr(exc) + "\n"
+# WIP..
 # Set debug=True for the server to auto-reload when there are changes
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)
