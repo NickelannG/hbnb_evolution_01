@@ -6,6 +6,8 @@ from models.city import City
 from models.country import Country
 from models.user import User
 from models.review import Review
+from models.amenity import Amenity
+from models.place import Place
 from data import country_data, place_data, amenity_data, place_to_amenity_data, review_data, user_data, city_data
 
 app = Flask(__name__)
@@ -567,7 +569,7 @@ def reviews_get():
     return jsonify(data)
 
 @app.route('/api/v1/reviews/<review_id>', methods=["GET"])
-def reviews_speific_get(review_id):
+def reviews_specific_get(review_id):
     """returns specified review"""
     data = []
 
@@ -639,7 +641,7 @@ def review_post():
 
     return jsonify(attribs)
 
-@app.route('/api/v1/review/<review_id>', methods=["PUT"])
+@app.route('/api/v1/reviews/<review_id>', methods=["PUT"])
 def review_put(review_id):
     """ updates existing review data using specified id """
     # -- Usage example --
@@ -684,9 +686,48 @@ def review_put(review_id):
     # print out the updated review details
     return jsonify(attribs)
 
-@app.route('/api/v1/review/<review_id>/place', methods=["GET"])
+@app.route('/api/v1/reviews/<review_id>/place', methods=["GET"])
 def review_specific_place_get(review_id):
     """Returns place data of specific review"""
+    # Check if the provided review ID exists in the review_data dictionary
+    if review_id not in review_data:
+        # If review not found, return message
+        return "Review not found"
+
+    # Retrieve the review's details from review_data
+    review = review_data[review_id]
+
+    # Retrieve place ID associated with the review
+    place_id = review['place_id']
+
+    # Check if the place ID exists in place_data dictionary
+    if place_id not in place_data:
+        # If place not found for the review, return a message indicating
+        return "Place not found for review with ID: {}".format(review_id)
+    
+    # Retrieve the place's details from place_data
+    p = place_data[place_id]
+
+    # Counstruct place details dictionary with required information
+    place_details = {
+        "id": p['id'],
+        "host_user_id": p["host_user_id"],
+        "city_id": p["city_id"],
+        "name": p["name"],
+        "description": p["description"],
+        "address": p["address"],
+        "longitude": p["longitude"],
+        "latitude": p["latitude"],
+        "number_of_rooms": p["number_of_rooms"],
+        "bathrooms": p["bathrooms"],
+        "price_per_night": p["price_per_night"],
+        "max_guests": p["max_guests"],
+        "created_at": datetime.fromtimestamp(p["created_at"]),
+        "updated_at": datetime.fromtimestamp(p["updated_at"])
+    }
+
+    # Return the place details as JSON response
+    return jsonify(place_details)
 
 @app.route('/api/v1/review/<review_id>/user', methods=["GET"])
 def review_specific_user_get(review_id):
@@ -709,17 +750,17 @@ def review_specific_user_get(review_id):
         return "User not found for review with ID: {}".format(review_id)
     
     # Retrieve the user's details from user_data
-    r = user_data[user_id]
+    u = user_data[user_id]
 
     # Counstruct user details dictionary with required information
     user_details = {
-        "id": r['id'],
-        "feedback": r["feedback"],
-        "commentor_user_id": r["commentor_user_id"],
-        "place_id": r["place_id"],
-        "rating": r["rating"],
-        "created_at": datetime.fromtimestamp(r["created_at"]),
-        "updated_at": datetime.fromtimestamp(r["updated_at"])
+        "id": u['id'],
+        "first_name": u["first_name"],
+        "last_name": u["last_name"],
+        "email": u["email"],
+        "password": u["password"],
+        "created_at": datetime.fromtimestamp(u["created_at"]),
+        "updated_at": datetime.fromtimestamp(u["updated_at"])
     }
 
     # Return the user details as JSON response
@@ -728,10 +769,142 @@ def review_specific_user_get(review_id):
 
 
 # --- AMENITY ---
-@app.route('/api/v1/amenity', methods=["GET"])
+@app.route('/api/v1/amenities', methods=["GET"])
 def amenity_get():
-    """Return Amenity"""
+    """Return Amenities"""
     data = []
+
+    for k, v in amenity_data.items():
+        data.append({
+            "id": v['id'],
+            "name": v['name'],
+            "created_at": datetime.fromtimestamp(v['created_at']),
+            "updated_at": datetime.fromtimestamp(v['updated_at'])
+        })
+    return jsonify(data)
+
+
+@app.route('/api/v1/amenities/<amenity_id>', methods=["GET"])
+def amenity_specific_get(amenity_id):
+    """returns specified amenity"""
+    data = []
+
+    if amenity_id not in amenity_data:
+        # raise IndexError("Review not found!")
+        return "Amenity not found!"
+    
+    v = amenity_data[amenity_id]
+    data.append({
+            "id": v['id'],
+            "name": v['name'],
+            "created_at": datetime.fromtimestamp(v['created_at']),
+            "updated_at": datetime.fromtimestamp(v['updated_at'])
+    })
+    return jsonify(data)
+
+@app.route('/api/v1/amenities', methods=["POST"])
+def amenity_post():
+    """Posts data for new amenities then return amenity data"""
+    # -- Usage example --
+    # curl -X POST [URL] /
+    #    -H "Content-Type: application/json" /
+    #    -d '{"key1":"value1","key2":"value2"}'
+
+    if request.get_json() is None:
+        abort(400, "Not a JSON")
+
+    data = request.get_json()
+    if 'name' not in data:
+        abort(400, "Missing name")
+
+    try:
+        a = Amenity(name=data["name"])
+    except ValueError as exc:
+        return repr(exc) + "\n"
+
+    # add new amenity data to amenity_data
+    # note that the created_at and updated_at are using timestamps
+
+    amenity_data[a.id] = {
+        "id": a.id,
+        "name": a.name,
+        "created_at": a.created_at,
+        "updated_at": a.updated_at
+    }
+
+    attribs = {
+        "id": a.id,
+        "name": a.name,
+        "created_at": datetime.fromtimestamp(a.created_at),
+        "updated_at": datetime.fromtimestamp(a.updated_at)
+    }
+
+    return jsonify(attribs)
+
+
+@app.route('/api/v1/amenities/<amenity_id>', methods=["PUT"])
+def amenity_put(amenity_id):
+    """ updates existing amenity data using specified id """
+    # -- Usage example --
+    # curl -X PUT [URL] /
+    #    -H "Content-Type: application/json" /
+    #    -d '{"key1":"value1","key2":"value2"}'
+
+    a = {}
+
+    if request.get_json() is None:
+        abort(400, "Not a JSON")
+
+    data = request.get_json()
+    for k, v in amenity_data.items():
+        if v['id'] == amenity_id:
+            a = v
+
+    if not a:
+        abort(400, "Amenity not found for id {}".format(amenity_id))
+
+    # modify the values
+    # only name is allowed to be modified
+    for k, v in data.items():
+        if k in ["name"]:
+            a[k]: v
+
+     # update 'updated_at' timestamp
+    a["updated_at"] = datetime.now().timestamp()
+
+    # update amenity_data - print amenity data out to confirm if needed
+    amenity_data[a['id']] = a
+
+    attribs = {
+        "id": a["id"],
+        "name": a["name"],
+        "created_at": datetime.fromtimestamp(a["created_at"]),
+        "updated_at": datetime.fromtimestamp(a["updated_at"])
+    }
+    # print out the updated review details
+    return jsonify(attribs)
+
+
+@app.route('/api/v1/amenities/<amenity_id>/place', methods=["GET"])
+def amenity_specific_places_get(amenity_id):
+    """Returns places data of specific amenity"""
+     # Initialize empty list to store cities data
+    data = []
+    
+
+    if amenity_id not in amenity_data:
+        # raise IndexError("Review not found!")
+        return "Amenity not found!"
+
+    # Iterate through the city_data dictionary to find cities belonging to the country with the wanted_country_id
+    for k, v in place_to_amenity_data.items():
+        if 'amenity_id' in v and v['amenity_id'] == amenity_id:
+            # If the city belongs to the country, construct a dictionary containing city details and append it to the data list
+            data.append({
+                "place_id": v['place_id'],
+            })
+
+    return jsonify(data)
 # --- PLACE ---
 
 # WIP..
