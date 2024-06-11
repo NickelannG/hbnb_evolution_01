@@ -17,8 +17,8 @@ class Place():
         self.address = ""
         self.latitude = 0.0
         self.longitude = 0.0
-        self.num_rooms = 0
-        self.num_bathrooms = 0
+        self.number_of_rooms = 0
+        self.bathrooms = 0
         self.price_per_night = 0.0
         self.max_guests = 0
 

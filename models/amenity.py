@@ -15,15 +15,15 @@ class Amenity():
         self.created_at = datetime.now().timestamp()
         self.updated_at = self.created_at
         self.__name = ""
-        self.__amenity_id = ""
+        # self.__amenity_id = ""
 
 
         if kwargs: # Keyword arguments passed in _init_ method
             for key, value in kwargs.items():
                 if key == "name":
                     self.name = value
-                elif key == "amenity_id":
-                    self.amenity_id = value
+                # elif key == "amenity_id":
+                    # self.amenity_id = value
 
     @property
     def name(self):
@@ -40,16 +40,16 @@ class Amenity():
         else:
             raise ValueError("Invalid name of amenity: {}".format(value))
     
-    @property
-    def amenity_id(self):
-        """Getter for private amenity ID"""
-        return self.__amenity_id
+    # # @property
+    # def amenity_id(self):
+        # """Getter for private amenity ID"""
+       #  return self.__amenity_id
     
-    @amenity_id.setter
-    def amenity_id(self, value):
-        """Setter for private prop amenity ID"""
+    # @amenity_id.setter
+    # def amenity_id(self, value):
+       #  """Setter for private prop amenity ID"""
 
-        if amenity_data.get(value) is not None:
-            self.__amenity_id = value
-        else:
-            raise ValueError("Invalid amenity ID: {}".format(value))
+        # if amenity_data.get(value) is not None:
+            # self.__amenity_id = value
+        # else:
+            # raise ValueError("Invalid amenity ID: {}".format(value))
