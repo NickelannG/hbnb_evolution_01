@@ -15,12 +15,12 @@ class Review():
         self.created_at = datetime.now().timestamp()
         self.updated_at = self.created_at
         self.feedback = ""
-        self.__commenter_user_id = ""
+        self.__commentor_user_id = ""
         self.__place_id = ""
         self.__rating = ""
 
         attr_list = [
-            "feedback", "commenter_user_id", "place_id", "rating"
+            "feedback", "commentor_user_id", "place_id", "rating"
         ]
 
         if kwargs:
@@ -29,15 +29,15 @@ class Review():
                     setattr(self, key, value)
 
     @property
-    def commenter_user_id(self):
-        """Getter for commenter_user_id"""
-        return self.__commenter_user_id
+    def commentor_user_id(self):
+        """Getter for commentor_user_id"""
+        return self.__commentor_user_id
     
-    @commenter_user_id.setter
-    def commenter_user_id(self, value):
-        """Setter for commenter_user_id"""
-        if user_data.get(value) is not None:
-            self.__commenter_user_id = value
+    @commentor_user_id.setter
+    def commentor_user_id(self, value):
+        """Setter for commentor_user_id"""
+        if user_data.get(value) is not None: 
+            self.__commentor_user_id = value
         
         else:
             raise ValueError("Invalid commenter user ID specified: {}".format(value))
