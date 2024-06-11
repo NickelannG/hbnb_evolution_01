@@ -1224,8 +1224,12 @@ def place_specific_amenities_get(place_id):
         if v['id'] == place_id:
             # Once the place with the specified code is found, store its ID
             wanted_place_id = v['id']
+            # Exit the loop once the place is found
 
-    # Iterate through the place_to_amenity_data dictionary to find amenities belonging to the place with the wanted_place_id
+    if not wanted_place_id:
+        return jsonify(data)  # Return empty data if the place ID was not found
+
+    # Iterate through the list in place_to_amenity_data to find amenities belonging to the place with the wanted_place_id
     for k, v in place_to_amenity_data.items():
         if v['place_id'] == wanted_place_id:
             # If the amenity belongs to the place, construct a dictionary containing amenity details and append it to the data list
