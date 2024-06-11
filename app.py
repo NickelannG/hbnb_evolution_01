@@ -905,7 +905,336 @@ def amenity_specific_places_get(amenity_id):
             })
 
     return jsonify(data)
+
+
 # --- PLACE ---
+@app.route('/api/v1/places', methods=["GET"])
+def place_get():
+    """Returns Place"""
+    data = []
+
+    for k, v in place_data.items():
+        data.append({
+            "id": v['id'],
+            "host_user_id": v['host_user_id'],
+            "city_id": v['city_id'],
+            "name": v['name'],
+            "description": v['description'],
+            "address": v['address'],
+            "latitude": v['latitude'],
+            "longitude": v['longitude'],
+            "number_of_rooms": v['number_of_rooms'],
+            "bathrooms": v['bathrooms'],
+            "price_per_night": v['price_per_night'],
+            "max_guests": v['max_guests'],
+            "created_at": datetime.fromtimestamp(v['created_at']),
+            "updated_at": datetime.fromtimestamp(v['updated_at'])
+        })
+    return jsonify(data)
+
+@app.route('/api/v1/places/<place_id>', methods=["GET"])
+def places_specific_get(place_id):
+    """Returns specific place"""
+    data = []
+
+    if place_id not in place_data:
+        #Raise IndexError("Place not found!")
+        return "Place not found!"
+
+    v = place_data[place_id]
+    data.append({
+            "id": v['id'],
+            "host_user_id": v['host_user_id'],
+            "city_id": v['city_id'],
+            "name": v['name'],
+            "description": v['description'],
+            "address": v['address'],
+            "latitude": v['latitude'],
+            "longitude": v['longitude'],
+            "number_of_rooms": v['number_of_rooms'],
+            "bathrooms": v['bathrooms'],
+            "price_per_night": v['price_per_night'],
+            "max_guests": v['max_guests'],
+            "created_at": datetime.fromtimestamp(v['created_at']),
+            "updated_at": datetime.fromtimestamp(v['updated_at'])
+            })
+    return jsonify(data)
+
+@app.route('/api/v1/places', methods=["POST"])
+def place_post():
+    """Posts data for new places then return place data"""
+     # -- Usage example --
+    # curl -X POST [URL] /
+    #    -H "Content-Type: application/json" /
+    #    -d '{"key1":"value1","key2":"value2"}'
+
+    if request.get_json() is None:
+        abort(400, "Not a JSON")
+
+    data = request.get_json()
+    if 'description' not in data:
+        abort(400, "Missing description")
+    if 'address' not in data:
+        abort(400, "Missing address")
+    if 'latitude' not in data:
+        abort(400, "Missing latitude")
+    if 'longitude' not in data:
+        abort(400, "Missing longitude")
+    if 'number_of_rooms' not in data:
+        abort(400, "Missing number of rooms")
+    if 'bathrooms' not in data:
+        abort(400, "Missing number of bathrooms")
+    if 'price_per_night' not in data:
+        abort(400, "Missing pricing per night")
+    if 'max_guests' not in data:
+        abort(400, "Missing max number of guests")
+    if 'name' not in data:
+        abort(400, "Missing name of place")
+    if 'host_user_id' not in data:
+        abort(400, "Missing host ID")
+    if 'city_id' not in data:
+        abort(400, "Missing city ID")
+
+    try:
+        p = Place(description=data["description"],
+                  address=data["address"],
+                  latitude=data["latitude"],
+                  longitude=data["longitude"],
+                  number_of_rooms=data["number_of_rooms"],
+                  bathrooms=data["bathrooms"],
+                  price_per_night=data["price_per_night"],
+                  max_guests=data["max_guests"],
+                  name=data["name"],
+                  host_user_id=data["host_user_id"],
+                  city_id=data["city_id"],
+                  )
+    except ValueError as exc:
+        return repr(exc) + "\n"
+
+    # add new place data to place_data
+    # note that the created_at and updated_at are using timestamps
+
+    place_data[p.id] = {
+        "id": p.id,
+        "host_user_id": p.host_user_id,
+        "city_id": p.city_id,
+        "name": p.name,
+        "description": p.description,
+        "address": p.address,
+        "latitude": p.latitude,
+        "longitude": p.longitude,
+        "number_of_rooms": p.number_of_rooms,
+        "bathrooms": p.bathrooms,
+        "price_per_night": p.price_per_night,
+        "max_guests": p.max_guests,
+        "created_at": p.created_at,
+        "updated_at": p.updated_at
+    }
+
+    attribs = {
+        "id": p.id,
+        "host_user_id": p.host_user_id,
+        "city_id": p.city_id,
+        "name": p.name,
+        "description": p.description,
+        "address": p.address,
+        "latitude": p.latitude,
+        "longitude": p.longitude,
+        "number_of_rooms": p.number_of_rooms,
+        "bathrooms": p.bathrooms,
+        "price_per_night": p.price_per_night,
+        "max_guests": p.max_guests,
+        "created_at": datetime.fromtimestamp(p.created_at),
+        "updated_at": datetime.fromtimestamp(p.updated_at)
+    }
+
+    return jsonify(attribs)
+
+@app.route('/api/v1/places/<place_id>', methods=["PUT"])
+def place_put(place_id):
+    """Updates existing place data using specific id"""
+    # -- Usage example --
+    # curl -X PUT [URL] /
+    #    -H "Content-Type: application/json" /
+    #    -d '{"key1":"value1","key2":"value2"}'
+
+    p = {}
+
+    if request.get_json() is None:
+        
+        data = request.get_json()
+
+    for k, v in place_data.items():
+        if v['id'] == place_id:
+            r = v
+
+    if not p:
+        abort(400, "Place not found for id {}".format(place_id))
+
+    # modify the values
+    # only name is allowed to be modified
+    for k, v in data.items():
+        if k in ["description","address", "latitude", "longitude",
+                 "number_of_rooms", "bathrooms", "price_per_night",
+                 "max_guests", "name", "host_user_id", "city_id"]:
+            p[k]: v
+
+    # update 'updated_at' timestamp
+    p["updated_at"] = datetime.now().timestamp()
+
+    # update palce_data - print place data out to confirm if needed
+    place_data[p['id']] = p
+
+    attribs = {
+        "id": p["id"],
+        "host_user_id": p["host_user_id"],
+        "city_id": p["city_id"],
+        "name": p["name"],
+        "description": p["description"],
+        "address": p["address"],
+        "latitude": p["latitude"],
+        "longitude": p["longitude"],
+        "number_of_rooms": p["number_of_rooms"],
+        "bathrooms": p["bathrooms"],
+        "price_per_night": p["price_per_night"],
+        "max_guests": p["max_guests"],
+        "created_at": datetime.fromtimestamp(p["created_at"]),
+        "updated_at": datetime.fromtimestamp(p["updated_at"])
+    }
+    # print out the updated place details
+    return jsonify(attribs)
+
+@app.route('/api/v1/places/<place_id>/user', methods=["GET"])
+def place_specific_user_get(place_id):
+    """Returns host user data of specified place"""
+
+    # Check if the provided place ID exists in the place_data dictionary
+    if place_id not in place_data:
+        # If place not found, return message
+        return "Place not found"
+    
+    # Retrieve the place's details from place_data
+    place = place_data[place_id]
+
+    # Retrieve user ID associated with the place
+    user_id = place['host_user_id']
+
+    # Check if the user ID exists in user_data dictionary
+    if user_id not in user_data:
+        # If user not found for the place, return message
+        return "Host user not found for place with ID: {}".format(place_id)
+    
+    # Retrieve the user's details from user_data
+    u = user_data[user_id]
+
+    # Construct user details dictionary with required information
+    user_details = {
+        "id": u["id"],
+        "first_name": u["first_name"],
+        "last_name": u["last_name"],
+        "email": u["email"],
+        "created_at": datetime.fromtimestamp(u["created_at"]),
+        "updated_at": datetime.fromtimestamp(u["updated_at"])
+    }
+
+    # Return the user details as JSON response
+    return jsonify(user_details)
+
+
+@app.route('/api/v1/places/<place_id>/city', methods=["GET"])
+def place_specific_city_get(place_id):
+    """Returns city data of specified place"""
+
+    # Check if the provided place ID exists in the place_data dictionary
+    if place_id not in place_data:
+        # If place not found, return message
+        return "Place not found"
+    
+    # Retrieve the place's details from place_data
+    place = place_data[place_id]
+
+    # Retrieve the city ID associated with the place
+    city_id = place['city_id']
+
+    if city_id not in city_data:
+        # If city not found for the place, return a message
+        return "City not found for place with ID: {}".format(place_id)
+
+    # Retrieve the city's details from country_data
+    C = city_data[city_id]
+
+    # Construct city details dictionary with required information
+    city_details = {
+        "id": C['id'],
+        "name": C['name'],
+        "country_id": C['country_id'],
+        "created_at": datetime.fromtimestamp(C['created_at']),
+        "updated_at": datetime.fromtimestamp(C['updated_at'])
+    }
+
+    # Return the city details as JSON response
+    return jsonify(city_details)
+
+
+@app.route('/api/v1/places/<place_id>/review', methods=["GET"])
+def place_specific_reviews_get(place_id):
+    """Returns review data of specified place"""
+
+    # Initialize empty list to store reviews data
+    data = []
+    
+    # Initialize a variable to store the place ID we are looking for
+    wanted_place_id = ""
+
+    # Iterate through the place_data dictionary to find the place with the provided place ID
+    for k, v in place_data.items():
+        if v['id'] == place_id:
+            # Once the place with the specified code is found, store its ID
+            wanted_place_id = v['id']
+
+    # Iterate through the city_data dictionary to find cities belonging to the country with the wanted_country_id
+    for k, v in review_data.items():
+        if v['place_id'] == wanted_place_id:
+            # If the review belongs to the place, construct a dictionary containing review details and append it to the data list
+            data.append({
+                "id": v['id'],
+                "feedback": v['feedback'],
+                "commentor_user_id": v["commentor_user_id"],
+                "place_id": v["place_id"],
+                "rating": v["rating"],
+                "created_at": datetime.fromtimestamp(v['created_at']),
+                "updated_at": datetime.fromtimestamp(v['updated_at'])
+            })
+
+    return jsonify(data)
+
+
+@app.route('/api/v1/places/<place_id>/amenity', methods=["GET"])
+def place_specific_amenities_get(place_id):
+    """Returns amenity data of specified place"""
+
+    # Initialize empty list to store amenities data
+    data = []
+    
+    # Initialize a variable to store the place ID we are looking for
+    wanted_place_id = ""
+
+    # Iterate through the place_data dictionary to find the place with the provided place ID
+    for k, v in place_data.items():
+        if v['id'] == place_id:
+            # Once the place with the specified code is found, store its ID
+            wanted_place_id = v['id']
+
+    # Iterate through the place_to_amenity_data dictionary to find amenities belonging to the place with the wanted_place_id
+    for k, v in place_to_amenity_data.items():
+        if v['place_id'] == wanted_place_id:
+            # If the amenity belongs to the place, construct a dictionary containing amenity details and append it to the data list
+            data.append({
+                "amenity_id": v['amenity_id'],
+                "place_id": v["place_id"]
+            })
+
+    return jsonify(data)
 
 # WIP..
 # Set debug=True for the server to auto-reload when there are changes
