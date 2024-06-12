@@ -119,7 +119,7 @@ def example_places_reviews():
 def users_get():
     """returns Users"""
     data = []
-
+"""
     for k, v in user_data.items():
         data.append({
             "id": v['id'],
@@ -130,6 +130,17 @@ def users_get():
             "created_at": datetime.fromtimestamp(v['created_at']),
             "updated_at": datetime.fromtimestamp(v['updated_at'])
         })
+"""
+    for user in user_data['User']:
+        data.append({
+            "id": user['id'],
+            "first_name": user['first_name'],
+            "last_name": user['last_name'],
+            "email": user['email'],
+            "password": user['password'],
+            "created_at": datetime.fromtimestamp(user['created_at']),
+            "updated_at": datetime.fromtimestamp(user['updated_at'])
+    })
 
     return jsonify(data)
 
@@ -239,6 +250,15 @@ def users_put(user_id):
 
     # print out the updated user details
     return jsonify(attribs)
+
+@app.route('/api/v1/users/<user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    """ Deletes a user of specific id"""
+    if user_id not in user_data:
+        abort(404, "User not found for id {}".format(user_id))
+    
+    del user_data[user_id]
+    return jsonify({'message': 'User id {} deleted successfully'.format(user_id)})
 
 # --- COUNTRY ---
 @app.route('/api/v1/countries', methods=["POST"])

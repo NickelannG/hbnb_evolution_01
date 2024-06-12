@@ -76,3 +76,14 @@ class FileStorage():
                 grouped_data[place_id].append(amenity_id)
 
         return grouped_data
+
+    def update_and_save_model_data(self, data, filename):
+        """ Update and save the data dictionary to a JSON file """
+        with open(filename, "w", encoding='utf-8') as f:
+            try:
+                json.dump(data, f)
+                return True  # Indicate success
+            except TypeError as exc:
+                raise TypeError("Non-serializable data type encountered: {}".format(exc)) from exc
+            except Exception as e:
+                raise Exception("An error occurred while saving the data: {}".format(e)) from e
