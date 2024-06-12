@@ -1212,25 +1212,10 @@ def place_specific_reviews_get(place_id):
 @app.route('/api/v1/places/<place_id>/amenity', methods=["GET"])
 def place_specific_amenities_get(place_id):
     
-    output = {}
-    
-    # Check if the place_id exists in place_data
-    if place_id not in place_data:
+    if place_id in place_to_amenity_data:
+        return jsonify({place_id: place_to_amenity_data[place_id]}), 200
+    else:
         return jsonify({"error": "Place ID not found"}), 404
-    
-    place_name = place_data[place_id]['name']
-    
-    if place_name not in output:
-        output[place_name] = []
-
-    # Iterate through the list in place_to_amenity_data["Place_to_Amenity"]
-    for item in place_to_amenity_data.items():
-        if item['place_id'] == place_id:
-            amenity_id = item['amenity_id']
-            amenity_name = amenity_data[amenity_id]['name']
-            output[place_name].append(amenity_name)
-
-    return jsonify(output)
 
 # WIP..
 # Set debug=True for the server to auto-reload when there are changes
