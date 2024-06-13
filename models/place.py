@@ -29,7 +29,7 @@ class Place():
 
         attr_list = [
             "description", "address", "latitude", "longitude",
-            "num_rooms", "num_bathrooms", "price_per_night", "max_guests",
+            "number_of_rooms", "bathrooms", "price_per_night", "max_guests",
             "name", "host_user_id", "city_id"
         ]
 
