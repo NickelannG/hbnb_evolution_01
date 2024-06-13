@@ -112,6 +112,40 @@ def example_places_reviews():
 # - which places are owned by which users
 # - names of the owners of places with toilets
 
+@app.route('/example/countries_places')
+def example_countries_places():
+    """prints out places within the countries"""
+
+    output = {}
+
+    for key in place_data:
+        row = place_data[key]
+        country_id = row['country_id']
+        country_name = country_data[country_id]['name']
+        if country_name not in output:
+            output[country_name] = []
+        
+        output[country_name].append(row['name'])
+
+    return jsonify(output)
+
+@app.route('/example/users_places')
+def example_users_places():
+    """ prints out places owned by certain users"""
+
+    output = {}
+
+    for key in place_data:
+        row = place_data[key]
+        user_id = row['user_id']
+        user_name = user_data[user_id]['name']
+        if user_name not in output:
+            output[user_name] = []
+        
+        output[user_name].append(row['name'])
+
+    return jsonify(output)
+
 
 # --- API endpoints ---
 # --- USER ---
@@ -559,6 +593,14 @@ def cities_specific_country_get(city_id):
     # Return the country details as JSON response
     return jsonify(country_details)
 
+@app.route('/api/v1/cities/<city_id>', methods=['DELETE'])
+def delete_city(city_id):
+    """ Deletes a city of specific id"""
+    if city_id not in city_data:
+        abort(404, "City not found for id {}".format(city_id))
+    
+    del city_data[city_id]
+    return jsonify({'message': 'City id {} deleted successfully'.format(city_id)})
 
 # --- REVIEW ---
 @app.route('/api/v1/reviews', methods=["GET"])
@@ -776,6 +818,14 @@ def review_specific_user_get(review_id):
     # Return the user details as JSON response
     return jsonify(user_details)
 
+@app.route('/api/v1/reviews/<review_id>', methods=['DELETE'])
+def delete_review(review_id):
+    """ Deletes a review of specific id"""
+    if review_id not in user_data:
+        abort(404, "Review not found for id {}".format(review_id))
+    
+    del review_data[review_id]
+    return jsonify({'message': 'Review id {} deleted successfully'.format(review_id)})
 
 
 # --- AMENITY ---
@@ -915,6 +965,15 @@ def amenity_specific_places_get(amenity_id):
             })
 
     return jsonify(data)
+
+@app.route('/api/v1/amenities/<amenity_id>', methods=['DELETE'])
+def delete_amenity(amenity_id):
+    """ Deletes an amenity of specific id"""
+    if amenity_id not in amenity_data:
+        abort(404, "Amenity not found for id {}".format(amenity_id))
+
+    del amenity_data[amenity_id]
+    return jsonify({'message': 'Amenity id {} deleted successfully'.format(amenity_id)})
 
 
 # --- PLACE ---
@@ -1227,7 +1286,15 @@ def place_specific_amenities_get(place_id):
     else:
         return jsonify({"error": "Place ID not found"}), 404
 
-# WIP..
+@app.route('/api/v1/places/<place_id>', methods=['DELETE'])
+def delete_place(place_id):
+    """ Deletes a place of specific id"""
+    if place_id not in place_data:
+        abort(404, "Place not found for id {}".format(place_id))
+    
+    del place_data[place_id]
+    return jsonify({'message': 'Place id {} deleted successfully'.format(place_id)})
+
 # Set debug=True for the server to auto-reload when there are changes
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)
