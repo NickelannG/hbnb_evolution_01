@@ -16,7 +16,7 @@ class TestAmenity(unittest.TestCase):
         a = Amenity(name="fridge")
 
         # Check if review instance is not none
-        self.assertIsNotNone(r)
+        self.assertIsNotNone(a)
 
     def test_create_amenity_invalid_name(self):
         """ Tests error handling during creation of amenity instances """

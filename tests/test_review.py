@@ -13,23 +13,17 @@ class TestReview(unittest.TestCase):
 
         # don't forget to include the TESTING = 1 flag at the command line
         # type in the terminal: TESTING=1 python3 -m unittest discover
-        r = Review(feedback="Food sucks", commenter_user_id="d32cbeb4-a526-4500-b865-4398cc6a6976", place_id="4466e456-f2bf-47aa-8755-ed39374b9a89", rating="0.25")
+        r = Review(feedback="Food sucks", commentor_user_id="0215a722-a3fc-4f08-9120-f8621147f2be", place_id="90c83333-35d4-4638-bdd8-1eceac56915e", rating=2)
 
         # Check if review instance is not none
         self.assertIsNotNone(r)
 
-    def test_create_review_invalid_commenter_user_id(self):
+    def test_create_review_invalid_commentor_user_id(self):
         """ Tests error handling during creation of review instances """
 
-        error = 0
-        try:
-            # invalid characters
-            Review(commenter_user_id="Kelly")
-        except ValueError:
-            error = 1
+        with self.assertRaises(ValueError):
+            Review(commentor_user_id="93cc1b92-1927-4c21-bdc8-91fec1360564")
 
-        # We're not able to use self.assertRaises here since it can't take kwargs
-        self.assertEqual(error, 1)
 
     def test_create_review_invalid_rating(self):
         """ Tests error handling during creation of City instances """
