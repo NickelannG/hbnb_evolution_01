@@ -8,9 +8,12 @@ from models.user import User
 from models.review import Review
 from models.amenity import Amenity
 from models.place import Place
+from data.file_storage import FileStorage
 from data import country_data, place_data, amenity_data, place_to_amenity_data, review_data, user_data, city_data
 
 app = Flask(__name__)
+
+storage = FileStorage()
 
 @app.route('/')
 def hello_world():
@@ -146,6 +149,34 @@ def example_users_places():
 
     return jsonify(output)
 
+@app.route('/example/users_places_toilets')
+def example_users_places_toilets():
+    """ Prints out owners of places with toilets"""
+
+    output = {}
+
+    # Loop through each entry in place_data
+    for key in place_data:
+        # Get the current place's data (a dictionary) using the current key
+        row = place_data[key]
+
+        # Extract the number of bathrooms from current place_data
+        bathrooms = row['bathrooms']
+        
+        if bathrooms > 0:
+            # Extract user_id from the current place
+            user_id = row['user_id']
+            # Get user name from user_id
+            user_name = user_data[user_id]['name']
+
+            # if user name is not already a key in the output dicitonary, add it
+            if user_name not in output:
+                output[user_name] = []
+            
+            # Append the place name to the list of places for the current user
+            output[user_name].append(row['name'])
+    
+    return jsonify(output)
 
 # --- API endpoints ---
 # --- USER ---
