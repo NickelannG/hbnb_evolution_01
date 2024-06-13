@@ -4,8 +4,8 @@
 import unittest
 from models.user import User
 
-class TestCity(unittest.TestCase):
-    """Test that the models works as expected
+class TestUser(unittest.TestCase):
+    """Test that the user models works as expected
     """
 
     def test_create_user(self):
@@ -17,7 +17,7 @@ class TestCity(unittest.TestCase):
 
         self.assertIsNotNone(u)
 
-    def test_create_user_invalid_email(self):
+    def test_create_user_invalid_name(self):
         """ Tests error handling during creation of User instances """
 
         error = 0

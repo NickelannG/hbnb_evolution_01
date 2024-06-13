@@ -1,45 +1,43 @@
 #!/usr/bin/python3
 """ Unittests for HBnB Evolution Part 1 """
 
-# from io import StringIO
-# import sys
-import os
 import unittest
-from models.city import City
-import data as data
+from models.review import Review
 
-class TestCity(unittest.TestCase):
-    """Test that the city models works as expected
+class TestReview(unittest.TestCase):
+    """Test that the review models work as expected
     """
 
-    def test_create_city(self):
-        """Tests creation of City instances """
+    def test_create_review(self):
+        """ Tests creation of Review instances """
 
-        # Note that this test only works if the test country data is loaded
         # don't forget to include the TESTING = 1 flag at the command line
         # type in the terminal: TESTING=1 python3 -m unittest discover
-        c = City(name="Vancouver", country_id="d291a77f-fa95-4385-b70e-2691df246475")
+        r = Review(feedback="Food sucks", commenter_user_id="d32cbeb4-a526-4500-b865-4398cc6a6976", place_id="4466e456-f2bf-47aa-8755-ed39374b9a89", rating="0.25")
 
-        self.assertIsNotNone(c)
+        # Check if review instance is not none
+        self.assertIsNotNone(r)
 
-    def test_create_city_invalid_name(self):
-        """ Tests error handling during creation of City instances """
+    def test_create_review_invalid_commenter_user_id(self):
+        """ Tests error handling during creation of review instances """
 
         error = 0
         try:
-            City(name="@#$%^&", country_id="d291a77f-fa95-4385-b70e-2691df246475")
+            # invalid characters
+            Review(commenter_user_id="Kelly")
         except ValueError:
             error = 1
 
         # We're not able to use self.assertRaises here since it can't take kwargs
         self.assertEqual(error, 1)
 
-    def test_create_city_invalid_country_id(self):
+    def test_create_review_invalid_rating(self):
         """ Tests error handling during creation of City instances """
 
         error = 0
         try:
-            City(name="Wakanda", country_id="616")
+            # Not an int
+            Review(rating="poor")
         except ValueError:
             error = 1
 
