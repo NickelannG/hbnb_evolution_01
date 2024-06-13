@@ -186,15 +186,17 @@ def users_get():
     data = []
 
     for k, v in user_data.items():
-        data.append({
+        user_info = {
             "id": v['id'],
             "first_name": v['first_name'],
             "last_name": v['last_name'],
             "email": v['email'],
-            "password": v['password'],
             "created_at": datetime.fromtimestamp(v['created_at']),
             "updated_at": datetime.fromtimestamp(v['updated_at'])
-        })
+        }
+        if 'password' in v:  # Check if 'password' key exists
+            user_info['password'] = v['password']
+        data.append(user_info)
     
     return jsonify(data)
 
@@ -251,9 +253,15 @@ def users_post():
         "first_name": u.first_name,
         "last_name": u.last_name,
         "email": u.email,
+        "password": u.password,
         "created_at": u.created_at,
         "updated_at": u.updated_at
     }
+
+    save_success = storage.update_and_save_model_data(user_data, 'data/user.json')
+
+    if not save_success:
+        abort(500, "Failed to save user data")
 
     # note that the created_at and updated_at are using readable datetimes
     attribs = {
@@ -294,6 +302,9 @@ def users_put(user_id):
     # update user_data with the new name - print user_data out to confirm it if you want
     user_data[user_id] = u
 
+    # Save updated user_data back to file
+    save_success = storage.update_and_save_model_data(user_data, 'data/user.json')
+
     attribs = {
         "id": u["id"],
         "first_name": u["first_name"],
@@ -313,6 +324,10 @@ def delete_user(user_id):
         abort(404, "User not found for id {}".format(user_id))
     
     del user_data[user_id]
+
+    # Save updated user_data back to file
+    save_success = storage.update_and_save_model_data(user_data, 'data/user.json')
+
     return jsonify({'message': 'User id {} deleted successfully'.format(user_id)})
 
 # --- COUNTRY ---
