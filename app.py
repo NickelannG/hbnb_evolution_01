@@ -117,18 +117,43 @@ def example_places_reviews():
 
 @app.route('/example/countries_places')
 def example_countries_places():
-    """prints out places within the countries"""
+    """prints out places within a country"""
 
     output = {}
 
     for key in place_data:
         row = place_data[key]
-        country_id = row['country_id']
-        country_name = country_data[country_id]['name']
-        if country_name not in output:
-            output[country_name] = []
-        
-        output[country_name].append(row['name'])
+        # Extract city_id
+        city_id = row['city_id']
+        # initialize country_id
+        country_id = None
+
+        # Iterate through city data
+        for city_key in city_data:
+            row_city = city_data[city_key]
+            # Check if city_id matches id of current row
+            if row_city["id"] == city_id:
+                # Extract country id of current row
+                country_id = row_city["country_id"]
+                break
+
+        if country_id is not None:
+            country_name = None
+
+            # Iterate through country data
+            for country_key in country_data:
+                row_country = country_data[country_key]
+                # Check if country id of current row matches country_id in city data
+                if row_country["id"] == country_id:
+                    # Extract country name of current row
+                    country_name = row_country["name"]
+                    break
+            # If country name is found
+            if country_name is not None:
+                # If country name not already in output dict, add it
+                if country_name not in output:
+                    output[country_name] = []
+                output[country_name].append(row['name'])
 
     return jsonify(output)
 
@@ -137,11 +162,26 @@ def example_users_places():
     """ prints out places owned by certain users"""
 
     output = {}
-
+    
+    # Iterate through place data
     for key in place_data:
         row = place_data[key]
-        user_id = row['user_id']
-        user_name = user_data[user_id]['name']
+        # Extract host user id of current row
+        host_user_id = row['host_user_id']
+        # Initialize user_name to None
+        user_name = None
+
+        # Iterate through user_data
+        for user_key in user_data:
+            row_user = user_data[user_key]
+            # If id in current row matches host_user_id in place
+            if row_user["id"] == host_user_id:
+                # Extract id of user who owns current place
+                user = user_data[host_user_id]
+                # formatted this way to include both first and last name of user
+                user_name = f"{user['first_name']} {user['last_name']}"
+                break
+
         if user_name not in output:
             output[user_name] = []
         
@@ -165,9 +205,10 @@ def example_users_places_toilets():
         
         if bathrooms > 0:
             # Extract user_id from the current place
-            user_id = row['user_id']
+            host_user_id = row['host_user_id']
             # Get user name from user_id
-            user_name = user_data[user_id]['name']
+            user = user_data[host_user_id]
+            user_name = f"{user['first_name']} {user['last_name']}"
 
             # if user name is not already a key in the output dicitonary, add it
             if user_name not in output:
