@@ -334,12 +334,14 @@ def users_put(user_id):
         # only first_name and last_name are allowed to be modified
         if k in ["first_name", "last_name"]:
             u[k] = v
+        else:
+            abort(400, f"Invalid field: {k}")
 
     # update user_data with the new name - print user_data out to confirm it if you want
     user_data[user_id] = u
 
     # Save updated user_data back to file
-    save_success = storage.update_and_save_model_data(user_data, 'data/user.json')
+    # save_success = storage.update_and_save_model_data(user_data, 'data/user.json')
 
     attribs = {
         "id": u["id"],
@@ -467,8 +469,10 @@ def countries_put(country_code):
     # modify the values
     # only name is allowed to be modified
     for k, v in data.items():
-        if k in ["name"]:
+        if k in ["name", "code"]:
             c[k] = v
+        else:
+            abort(400, f"Invalid field: {k}")
 
     # update country_data with the new name - print country_data out to confirm it if you want
     country_data[c['id']] = c
@@ -622,6 +626,8 @@ def cities_put(city_id):
     for k, v in data.items():
         if k in ["name", "country_id"]:
             C[k] = v
+        else:
+            abort(400, f"Invalid field: {k}")
     
     # update 'updated_at' timestamp
     C["updated_at"] = datetime.now().timestamp()
@@ -801,6 +807,8 @@ def review_put(review_id):
     for k, v in data.items():
         if k in ["feedback", "commentor_user_id", "place_id", "rating"]:
             r[k]: v
+        else:
+            abort(400, f"Invalid field: {k}")
 
      # update 'updated_at' timestamp
     r["updated_at"] = datetime.now().timestamp()
@@ -1010,6 +1018,8 @@ def amenity_put(amenity_id):
     for k, v in data.items():
         if k in ["name"]:
             a[k]: v
+        else:
+            abort(400, f"Invalid field: {k}")
 
      # update 'updated_at' timestamp
     a["updated_at"] = datetime.now().timestamp()
@@ -1212,12 +1222,12 @@ def place_put(place_id):
     p = {}
 
     if request.get_json() is None:
-        
-        data = request.get_json()
+        abort(400, "Not a JSON")
 
+    data = request.get_json()
     for k, v in place_data.items():
         if v['id'] == place_id:
-            r = v
+            p = v
 
     if not p:
         abort(400, "Place not found for id {}".format(place_id))
@@ -1229,6 +1239,8 @@ def place_put(place_id):
                  "number_of_rooms", "bathrooms", "price_per_night",
                  "max_guests", "name", "host_user_id", "city_id"]:
             p[k]: v
+        else:
+            abort(400, f"Invalid field: {k}")
 
     # update 'updated_at' timestamp
     p["updated_at"] = datetime.now().timestamp()
