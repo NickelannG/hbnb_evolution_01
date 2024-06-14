@@ -205,10 +205,10 @@ class TestReviewPost(unittest.TestCase):
         """Test POST request with valid JSON data"""
         # JSON data for a new review
         data = {
-            "feedback": "Great experience!",
-            "commentor_user_id": "12345",  # Assuming a valid user id here
-            "place_id": "54321",            # Assuming a valid place id here
-            "rating": 5                     # Assuming a valid rating here
+            "feedback": "food sucks",
+            "commentor_user_id": "0215a722-a3fc-4f08-9120-f8621147f2be",
+            "place_id": "90c83333-35d4-4638-bdd8-1eceac56915e",
+            "rating": 2                    
         }
 
         # Send a POST request to the '/api/v1/reviews' endpoint
@@ -221,17 +221,17 @@ class TestReviewPost(unittest.TestCase):
         expected_keys = {"id", "feedback", "commentor_user_id", "place_id", "rating", "created_at", "updated_at"}
         review_data = response.json
         self.assertEqual(set(review_data.keys()), expected_keys)
-        self.assertEqual(review_data["feedback"], "Great experience!")
-        self.assertEqual(review_data["commentor_user_id"], "12345")
-        self.assertEqual(review_data["place_id"], "54321")
-        self.assertEqual(review_data["rating"], 5)
+        self.assertEqual(review_data["feedback"], "food sucks")
+        self.assertEqual(review_data["commentor_user_id"], "0215a722-a3fc-4f08-9120-f8621147f2be")
+        self.assertEqual(review_data["place_id"], "90c83333-35d4-4638-bdd8-1eceac56915e")
+        self.assertEqual(review_data["rating"], 2)
 
     def test_review_post_missing_feedback(self):
         """Test POST request with missing 'feedback' field"""
         data = {
-            "commentor_user_id": "12345",  # Assuming a valid user id here
-            "place_id": "54321",            # Assuming a valid place id here
-            "rating": 5                     # Assuming a valid rating here
+            "commentor_user_id": "0215a722-a3fc-4f08-9120-f8621147f2be",
+            "place_id": "90c83333-35d4-4638-bdd8-1eceac56915e",
+            "rating": 2
         }
 
         response = self.app.post('/api/v1/reviews', json=data)
@@ -240,9 +240,9 @@ class TestReviewPost(unittest.TestCase):
     def test_review_post_missing_commentor_user_id(self):
         """Test POST request with missing 'commentor_user_id' field"""
         data = {
-            "feedback": "Great experience!",
-            "place_id": "54321",            # Assuming a valid place id here
-            "rating": 5                     # Assuming a valid rating here
+            "feedback": "food sucks",
+            "place_id": "90c83333-35d4-4638-bdd8-1eceac56915e",
+            "rating": 2
         }
 
         response = self.app.post('/api/v1/reviews', json=data)
