@@ -573,28 +573,28 @@ def city_post():
         abort(400, "Missing country_id") 
 
     try:
-        C = City(name=data["name"], country_id=data["country_id"])
+        city = City(name=data["name"], country_id=data["country_id"])
     except ValueError as exc:
         return repr(exc) + "\n"
 
     # add new user data to user_data
     # note that the created_at and updated_at are using timestamps
     
-    city_data[C.id] = {
-        "id": C.id,
-        "name": C.name,
-        "country_id": C.country_id,
-        "created_at": C.created_at,
-        "updated_at": C.updated_at
+    city_data[city.id] = {
+        "id": city.id,
+        "name": city.name,
+        "country_id": city.country_id,
+        "created_at": city.created_at,
+        "updated_at": city.updated_at
     }
 
     # note that the created_at and updated_at are using readable datetimes
     attribs = {
-        "id": C.id,
-        "name": C.name,
-        "country_id": C.country_id,
-        "created_at": datetime.fromtimestamp(C.created_at),
-        "updated_at": datetime.fromtimestamp(C.updated_at)
+        "id": city.id,
+        "name": city.name,
+        "country_id": city.country_id,
+        "created_at": datetime.fromtimestamp(city.created_at),
+        "updated_at": datetime.fromtimestamp(city.updated_at)
     }
 
     return jsonify(attribs)

@@ -16,7 +16,7 @@ class TestUsersPost(unittest.TestCase):
     """Test the '/api/v1/users' POST endpoint"""
 
      # don't forget to include the TESTING = 1 flag at the command line
-    # type in the terminal: TESTING=1 python3 -m unittest tests/test_user_post.py
+    # type in the terminal: TESTING=1 python3 -m unittest tests/test_post.py
     @classmethod
     def setUpClass(cls):
         """Set up the Flask test client"""
@@ -115,12 +115,13 @@ class TestCityPost(unittest.TestCase):
         cls.app = app.test_client()
 
 
+
     def test_city_post_success(self):
         """Test POST request with valid JSON data"""
         # JSON data for a new city
         data = {
-            "country_id": "4f722890-15ee-4d15-9c95-c335d2efc738",  # Assuming a valid country_id here
-            "name": "New York"
+            "country_id": "d291a77f-fa95-4385-b70e-2691df246475",  # Assuming a valid country_id here
+            "name": "Ontario"
         }
 
         # Send a POST request to the '/api/v1/cities' endpoint
@@ -133,13 +134,13 @@ class TestCityPost(unittest.TestCase):
         expected_keys = {"id", "name", "country_id", "created_at", "updated_at"}
         city_data = response.json
         self.assertEqual(set(city_data.keys()), expected_keys)
-        self.assertEqual(city_data["name"], "New York")
-        self.assertEqual(city_data["country_id"], "12345")
+        self.assertEqual(city_data["name"], "Ontario")
+        self.assertEqual(city_data["country_id"], "d291a77f-fa95-4385-b70e-2691df246475")
 
     def test_city_post_missing_name(self):
         """Test POST request with missing 'name' field"""
         data = {
-            "country_id": "12345"  # Assuming a valid country_id here
+            "country_id": "d291a77f-fa95-4385-b70e-2691df246475"  # Assuming a valid country_id here
         }
 
         response = self.app.post('/api/v1/cities', json=data)
@@ -148,7 +149,7 @@ class TestCityPost(unittest.TestCase):
     def test_city_post_missing_country_id(self):
         """Test POST request with missing 'country_id' field"""
         data = {
-            "name": "New York"
+            "name": "Ontario"
         }
 
         response = self.app.post('/api/v1/cities', json=data)
@@ -172,14 +173,15 @@ class TestAmenityPost(unittest.TestCase):
         }
 
         # Send a POST request to the '/api/v1/amenities' endpoint
-        response = self.app.post('/api/v1/amenities', json=data)
-
+        response = self.app.post('/api/v1/amenities', json=data, content_type='application/json')
+        # print(response.__dict__)
         # Assert the response status code is 200 OK
         self.assertEqual(response.status_code, 200)
 
         # Assert the response data
         expected_keys = {"id", "name", "created_at", "updated_at"}
         amenity_data = response.json
+        # print(amenity_data)
         self.assertEqual(set(amenity_data.keys()), expected_keys)
         self.assertEqual(amenity_data["name"], "Swimming Pool")
 
@@ -268,8 +270,8 @@ class TestPlacePost(unittest.TestCase):
             "price_per_night": 200,
             "max_guests": 6,
             "name": "Ocean View Villa",
-            "host_user_id": 1,
-            "city_id": 1
+            "host_user_id": "0215a722-a3fc-4f08-9120-f8621147f2be",
+            "city_id": "687da7c4-eaba-411f-b00d-65c954eb2b8c"
         }
 
         # Send a POST request to the '/api/v1/places' endpoint

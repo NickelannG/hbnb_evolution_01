@@ -34,7 +34,7 @@ class Amenity():
     def name(self, value):
         """Setter for private prop name."""
 
-        is_valid_name = len(value.strip()) > 0 and re.search("^[a-zA-Z]+$", value)
+        is_valid_name = len(value.strip()) > 0 and re.search("^[a-zA-Z ]+$", value)
         if is_valid_name:
             self.__name = value
         else:
