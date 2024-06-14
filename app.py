@@ -299,11 +299,6 @@ def users_post():
         "updated_at": u.updated_at
     }
 
-    save_success = storage.update_and_save_model_data(user_data, 'data/user.json')
-
-    if not save_success:
-        abort(500, "Failed to save user data")
-
     # note that the created_at and updated_at are using readable datetimes
     attribs = {
         "id": u.id,
