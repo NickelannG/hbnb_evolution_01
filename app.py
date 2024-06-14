@@ -364,7 +364,7 @@ def delete_user(user_id):
     del user_data[user_id]
 
     # Save updated user_data back to file
-    save_success = storage.update_and_save_model_data(user_data, 'data/user.json')
+    # save_success = storage.update_and_save_model_data(user_data, 'data/user.json')
 
     return jsonify({'message': 'User id {} deleted successfully'.format(user_id)})
 
@@ -911,7 +911,7 @@ def review_specific_user_get(review_id):
 @app.route('/api/v1/reviews/<review_id>', methods=['DELETE'])
 def delete_review(review_id):
     """ Deletes a review of specific id"""
-    if review_id not in user_data:
+    if review_id not in review_data:
         abort(404, "Review not found for id {}".format(review_id))
     
     del review_data[review_id]
@@ -1218,6 +1218,8 @@ def place_put(place_id):
     # curl -X PUT [URL] /
     #    -H "Content-Type: application/json" /
     #    -d '{"key1":"value1","key2":"value2"}'
+
+    # curl -X PUT localhost:5000/api/v1/places/90c83333-35d4-4638-bdd8-1eceac56915e -H "Content-Type: application/json" -d '{"description": "A decent hotel","address": "Next to Eastland Mall",# "latitude": -37.814666,"longitude": 145.230620,"number_of_rooms": 5,"bathrooms": 1,"price_per_night": 150.00,"max_guests": 2,"name": "Ringwood Hotel","host_user_id": #"0215a722-a3fc-4f08-9120-f8621147f2be","city_id": "687da7c4-eaba-411f-b00d-65c954eb2b8c"}'
 
     p = {}
 
